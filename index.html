@@ -525,10 +525,10 @@
 
           // 按 Locale 分组
           const groups = {};
-          voices.forEach((v, i) => {
-            const label = getLangLabel(v.Locale);
+          voices.forEach((voice, i) => {
+            const label = getLangLabel(voice.Locale);
             if (!groups[label]) groups[label] = [];
-            groups[label].push({ voice: v, index: i });
+            groups[label].push({ voice: voice, index: i });
           });
 
           // 语言优先级
@@ -551,7 +551,7 @@
               const cleanName = voice.FriendlyName
                 .replace('Microsoft ', '')
                 .replace(' Online (Natural) - ', ' - ')
-                .replace(v.Locale, '')
+                .replace(voice.Locale, '')
                 .trim();
               option.textContent = cleanName;
               option.dataset.locale = voice.Locale;
