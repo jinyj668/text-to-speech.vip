@@ -440,7 +440,7 @@
     </div>
   </div>
 
-  <script src="edge-tts.js?v=2"></script>
+  <script src="edge-tts.js?v=3"></script>
   <script>
     // ===== jinyj 的 Edge TTS 集成（基于 travisvn/edge-tts-client 翻译）=====
     const { EdgeTTSClient, DEFAULT_VOICES, concatUint8Arrays } = window.EdgeTTS;
@@ -811,19 +811,47 @@
             downloadBtn.addEventListener('click', downloadAudio);
             resetBtn.addEventListener('click', resetAll);
 
-            // 初始化 - 立即填充语音列表
-            try {
-              console.log('EdgeTTS:', window.EdgeTTS);
-              console.log('DEFAULT_VOICES:', DEFAULT_VOICES);
-              console.log('voices array length:', voices.length);
-              console.log('voiceSelect element:', voiceSelect);
-              populateVoiceList();
-              console.log('populateVoiceList done');
-            } catch (err) {
-              console.error('初始化错误:', err);
-              statusBar.textContent = '⚠ 初始化错误: ' + err.message;
-              statusBar.className = 'status-bar error';
+            // 调试：用 try-catch 包裹初始化
+            function safeInit() {
+              try {
+                console.log('=== Edge TTS Init Debug ===');
+                console.log('window.EdgeTTS:', typeof window.EdgeTTS, window.EdgeTTS);
+                console.log('EdgeTTSClient:', typeof EdgeTTSClient);
+                console.log('DEFAULT_VOICES:', typeof DEFAULT_VOICES, DEFAULT_VOICES && DEFAULT_VOICES.length);
+                console.log('concatUint8Arrays:', typeof concatUint8Arrays);
+                console.log('voices:', typeof voices, voices && voices.length);
+                console.log('voiceSelect:', !!voiceSelect, voiceSelect);
+
+                if (!window.EdgeTTS) {
+                  throw new Error('window.EdgeTTS 未定义 - edge-tts.js 没加载');
+                }
+                if (typeof EdgeTTSClient !== 'function') {
+                  throw new Error('EdgeTTSClient 不是函数');
+                }
+                if (!DEFAULT_VOICES || !DEFAULT_VOICES.length) {
+                  throw new Error('DEFAULT_VOICES 为空');
+                }
+                if (!voiceSelect) {
+                  throw new Error('voiceSelect 元素不存在');
+                }
+
+                populateVoiceList();
+                console.log('=== Init Success ===');
+              } catch (err) {
+                console.error('Init error:', err);
+                if (statusBar) {
+                  statusBar.textContent = '⚠ ' + err.message;
+                  statusBar.className = 'status-bar error';
+                }
+                // 把错误写到 voiceCount 区域，让用户能看到
+                if (voiceCount) {
+                  voiceCount.textContent = '错误: ' + err.message;
+                }
+              }
             }
+
+            // 立即执行
+            safeInit();
 
             // 页面关闭时清理
             window.addEventListener('beforeunload', () => {
