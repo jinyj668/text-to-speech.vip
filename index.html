@@ -440,7 +440,7 @@
     </div>
   </div>
 
-  <script src="edge-tts.js"></script>
+  <script src="edge-tts.js?v=2"></script>
   <script>
     // ===== jinyj 的 Edge TTS 集成（基于 travisvn/edge-tts-client 翻译）=====
     const { EdgeTTSClient, DEFAULT_VOICES, concatUint8Arrays } = window.EdgeTTS;
@@ -808,17 +808,28 @@
         });
 
         speakBtn.addEventListener('click', toggleSpeech);
-        downloadBtn.addEventListener('click', downloadAudio);
-        resetBtn.addEventListener('click', resetAll);
+            downloadBtn.addEventListener('click', downloadAudio);
+            resetBtn.addEventListener('click', resetAll);
 
-        // 初始化 - 立即填充语音列表
-        populateVoiceList();
+            // 初始化 - 立即填充语音列表
+            try {
+              console.log('EdgeTTS:', window.EdgeTTS);
+              console.log('DEFAULT_VOICES:', DEFAULT_VOICES);
+              console.log('voices array length:', voices.length);
+              console.log('voiceSelect element:', voiceSelect);
+              populateVoiceList();
+              console.log('populateVoiceList done');
+            } catch (err) {
+              console.error('初始化错误:', err);
+              statusBar.textContent = '⚠ 初始化错误: ' + err.message;
+              statusBar.className = 'status-bar error';
+            }
 
-        // 页面关闭时清理
-        window.addEventListener('beforeunload', () => {
-          if (currentAudio) currentAudio.pause();
-          if (ttsClient) ttsClient.close();
-        });
-      </script>
-    </body>
-    </html>
+            // 页面关闭时清理
+            window.addEventListener('beforeunload', () => {
+              if (currentAudio) currentAudio.pause();
+              if (ttsClient) ttsClient.close();
+            });
+          </script>
+        </body>
+        </html>
