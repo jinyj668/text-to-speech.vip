@@ -1,13 +1,9 @@
-/**
- * jinyj 的 Edge TTS 浏览器实现
- * 基于 travisvn/edge-tts-client (TypeScript) 翻译为纯 JavaScript
- *
- * 关键特性：
- * - 纯前端，无需后端
- * - 调用 Microsoft Edge TTS 官方 API
- * - 30+ 高质量神经声音
- * - 完全免费
- */
+// jinyj 的 Edge TTS 浏览器实现（v2 - 用 IIFE 避免全局污染）
+// 基于 travisvn/edge-tts-client (TypeScript) 翻译为纯 JavaScript
+// 关键：所有内容包在 IIFE 内，避免与其他脚本冲突
+
+(function(window) {
+  'use strict';
 
 const EDGE_TTS = {
   CLIENT_TOKEN: '6A5AA1D4EAFF4E9FB37E23D68491D6F4',
@@ -280,3 +276,5 @@ window.EdgeTTS = {
   uint8ArrayToBlob,
   concatUint8Arrays,
 };
+
+})(window);
