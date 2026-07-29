@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Edge TTS 诊断工具 - text-to-speech.vip</title>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+h1 { color: #1a73e8; }
+.box { background: white; padding: 20px; border-radius: 8px; margin: 16px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.status { padding: 12px; border-radius: 4px; margin: 12px 0; font-weight: bold; }
+.ok { background: #e8f5e9; color: #2e7d32; border: 2px solid #2e7d32; }
+.fail { background: #ffebee; color: #c62828; border: 2px solid #c62828; }
+.warn { background: #fff3e0; color: #e65100; border: 2px solid #e65100; }
+button { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; cursor: pointer; }
+button:hover { background: #1557b0; }
+pre { background: #f8f9fa; padding: 12px; border-radius: 4px; overflow-x: auto; font-size: 13px; }
+.voice-list { max-height: 300px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<h1>🔧 Edge TTS 诊断工具</h1>
+<p>这个页面帮 jinyj 检测浏览器是否能访问 Microsoft Edge TTS。</p>
+
+<button id="startBtn">点击开始诊断</button>
+
+<div id="results" style="margin-top: 20px;"></div>
+
+<script>
+const results = document.getElementById('results');
+
+function log(html, type = 'ok') {
+  const div = document.createElement('div');
+  div.className = 'box status ' + type;
+  div.innerHTML = html;
+  results.appendChild(div);
+}
+
+function logBox(title, content, type = '') {
+  const div = document.createElement('div');
+  div.className = 'box';
+  div.innerHTML = '<h3>' + title + '</h3><pre>' + content + '</pre>';
+  results.appendChild(div);
+}
+
+document.getElementById('startBtn').addEventListener('click', async () => {
+  results.innerHTML = '';
+  log('⏳ 正在诊断...', 'warn');
+
+  // 测试 1: HTTP
+  try {
+    const r = await fetch('https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=6A5AA1D4EAFF4E9FB37E23D68491D6F4');
+    const data = await r.json();
+    log('✅ 测试 1 通过：HTTP 可以访问 Microsoft Edge TTS<br>语音数量：' + data.length, 'ok');
+    window.testResult = { http: true, ws: false, voices: data };
+  } catch (e) {
+    log('❌ 测试 1 失败：HTTP 无法访问 Microsoft Edge TTS<br>错误：' + e.message, 'fail');
+    logBox('💡 这意味着 jinyj 的浏览器代理对 Microsoft Bing 不通', '需要换其他方案', '');
+    return;
+  }
+
+  // 测试 2: WebSocket
+  await new Promise(resolve => {
+    const ws = new WebSocket('wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4');
+    let resolved = false;
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        resolved = true;
+        log('❌ 测试 2 失败：WebSocket 无法连接（10秒超时）', 'fail');
+        resolve();
+      }
+    }, 10000);
+    ws.onopen = () => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
+      log('✅ 测试 2 通过：WebSocket 连接成功！', 'ok');
+      window.testResult.ws = true;
+      ws.close();
+      resolve();
+    };
+    ws.onerror = (e) => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
+      log('❌ 测试 2 失败：WebSocket 连接错误', 'fail');
+      logBox('详细错误', JSON.stringify({type: e.type, message: e.message || 'unknown'}, null, 2), '');
+      resolve();
+    };
+    ws.onclose = (e) => {
+      if (resolved) return;
+      resolved = true;
+      clearTimeout(timer);
+      if (e.code !== 1000 && e.code !== 1005) {
+        log('❌ 测试 2 失败：WebSocket 关闭 (code=' + e.code + ', reason=' + e.reason + ')', 'fail');
+      }
+      resolve();
+    };
+  });
+
+  // 总结
+  const tr = window.testResult;
+  if (tr.http && tr.ws) {
+    log('🎉 完美：HTTP 和 WebSocket 都通！<br>jinyj 的浏览器可以直接调 Edge TTS，方案 D 工作正常', 'ok');
+  } else if (tr.http && !tr.ws) {
+    log('⚠️ HTTP 通但 WebSocket 不通<br>jinyj 需要用 Cloudflare Worker 桥接（方案 C）', 'warn');
+    logBox('💡 解决思路', '在浏览器和 Edge TTS 之间加一个 Worker 中间层。\njinyj 浏览器 → HTTP → Cloudflare Worker → WebSocket → Edge TTS', '');
+  } else {
+    log('❌ jinyj 的浏览器代理对 Microsoft Bing 不通', 'fail');
+    logBox('💡 可能原因', '1. 代理软件未代理该域名\n2. 代理节点不支持 Microsoft\n3. 防火墙规则拦截', '');
+  }
+});
+</script>
+</body>
+</html>
