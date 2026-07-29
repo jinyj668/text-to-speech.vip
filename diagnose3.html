@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>WS 测试 v3</title>
+<style>
+body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; }
+.box { background: white; padding: 20px; border-radius: 8px; margin: 16px 0; border: 1px solid #ddd; }
+.ok { background: #e8f5e9; border-color: #2e7d32; }
+.fail { background: #ffebee; border-color: #c62828; }
+button { background: #1a73e8; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 16px; cursor: pointer; margin: 4px; }
+pre { background: #f8f9fa; padding: 12px; border-radius: 4px; overflow-x: auto; }
+</style>
+</head>
+<body>
+<h1>🔬 WebSocket 全面诊断</h1>
+<div id="r"></div>
+<button onclick="runAll()">一键测试所有 WebSocket</button>
+
+<script>
+const r = document.getElementById('r');
+function add(html, type='') {
+  const d = document.createElement('div');
+  d.className = 'box ' + type;
+  d.innerHTML = html;
+  r.appendChild(d);
+}
+
+async function testWS(url, name, timeout=8000) {
+  return new Promise(resolve => {
+    const ws = new WebSocket(url);
+    const start = Date.now();
+    let resolved = false;
+    const finish = (ok, detail) => {
+      if (resolved) return;
+      resolved = true;
+      try { ws.close(); } catch(e){}
+      resolve({ name, ok, detail, dur: Date.now() - start });
+    };
+    setTimeout(() => finish(false, 'timeout ' + timeout + 'ms'), timeout);
+    ws.onopen = () => finish(true, 'open OK');
+    ws.onerror = (e) => finish(false, 'error: ' + (e.type || 'unknown'));
+    ws.onclose = (e) => {
+      if (!resolved) finish(false, 'close code=' + e.code);
+    };
+  });
+}
+
+async function runAll() {
+  r.innerHTML = '';
+  add('⏳ 测试中...', '');
+
+  const tests = [
+    { url: 'wss://echo.websocket.events/', name: 'Echo WebSocket (公开测试)' },
+    { url: 'wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4', name: 'Microsoft Edge TTS' },
+    { url: 'wss://api.tts.travisvn.com/v1/tts', name: 'tts.travisvn.com (其他可能工作)' },
+    { url: 'wss://chatgpt.com/', name: 'chatgpt.com' },
+  ];
+
+  for (const t of tests) {
+    const r2 = await testWS(t.url, t.name);
+    const cls = r2.ok ? 'ok' : 'fail';
+    const icon = r2.ok ? '✅' : '❌';
+    add(icon + ' ' + r2.name + ' (' + r2.dur + 'ms)<br>详情: ' + r2.detail, cls);
+  }
+
+  // 总结
+  const echoOk = await testWS('wss://echo.websocket.events/', 'echo check', 5000);
+  if (!echoOk.ok) {
+    add('⚠️ jinyj 的浏览器 WebSocket 整体不通<br>需要换方案（macOS say 或放弃 TTS）', 'fail');
+  }
+}
+</script>
+</body>
+</html>
