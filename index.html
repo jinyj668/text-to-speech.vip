@@ -572,14 +572,6 @@
         }
 
         // 初始化 Edge TTS Client
-        async function ensureClient() {
-          if (ttsClient && ttsClient.ws && ttsClient.ws.readyState === WebSocket.OPEN) {
-            return ttsClient;
-          }
-          ttsClient = new EdgeTTSClient(false);
-          return ttsClient;
-        }
-
         // 朗读按钮
         async function toggleSpeech() {
           const text = textInput.value.trim();
@@ -814,56 +806,31 @@
         });
 
         speakBtn.addEventListener('click', toggleSpeech);
-            downloadBtn.addEventListener('click', downloadAudio);
-            resetBtn.addEventListener('click', resetAll);
+        downloadBtn.addEventListener('click', downloadAudio);
+        resetBtn.addEventListener('click', resetAll);
 
-            // 调试：用 try-catch 包裹初始化
-            function safeInit() {
-              try {
-                console.log('=== Edge TTS Init Debug ===');
-                console.log('window.EdgeTTS:', typeof window.EdgeTTS, window.EdgeTTS);
-                console.log('EdgeTTSClient:', typeof EdgeTTSClient);
-                console.log('DEFAULT_VOICES:', typeof DEFAULT_VOICES, DEFAULT_VOICES && DEFAULT_VOICES.length);
-                console.log('concatUint8Arrays:', typeof concatUint8Arrays);
-                console.log('voices:', typeof voices, voices && voices.length);
-                console.log('voiceSelect:', !!voiceSelect, voiceSelect);
+        // 初始化
+        try {
+          if (!window.EdgeTTS || !window.EdgeTTS.DEFAULT_VOICES) {
+            throw new Error('EdgeTTS 模块未加载');
+          }
+          if (!voiceSelect) {
+            throw new Error('声音选择器不存在');
+          }
+          populateVoiceList();
+          console.log('✓ Edge TTS 初始化成功，32 个语音');
+        } catch (err) {
+          console.error('Init error:', err);
+          if (statusBar) {
+            statusBar.textContent = '⚠ 初始化错误: ' + err.message;
+            statusBar.className = 'status-bar error';
+          }
+        }
 
-                if (!window.EdgeTTS) {
-                  throw new Error('window.EdgeTTS 未定义 - edge-tts.js 没加载');
-                }
-                if (typeof EdgeTTSClient !== 'function') {
-                  throw new Error('EdgeTTSClient 不是函数');
-                }
-                if (!DEFAULT_VOICES || !DEFAULT_VOICES.length) {
-                  throw new Error('DEFAULT_VOICES 为空');
-                }
-                if (!voiceSelect) {
-                  throw new Error('voiceSelect 元素不存在');
-                }
-
-                populateVoiceList();
-                console.log('=== Init Success ===');
-              } catch (err) {
-                console.error('Init error:', err);
-                if (statusBar) {
-                  statusBar.textContent = '⚠ ' + err.message;
-                  statusBar.className = 'status-bar error';
-                }
-                // 把错误写到 voiceCount 区域，让用户能看到
-                if (voiceCount) {
-                  voiceCount.textContent = '错误: ' + err.message;
-                }
-              }
-            }
-
-            // 立即执行
-            safeInit();
-
-            // 页面关闭时清理
-            window.addEventListener('beforeunload', () => {
-              if (currentAudio) currentAudio.pause();
-              if (ttsClient) ttsClient.close();
-            });
-          </script>
-        </body>
-        </html>
+        // 页面关闭时清理
+        window.addEventListener('beforeunload', () => {
+          if (currentAudio) currentAudio.pause();
+        });
+      </script>
+    </body>
+  </html>
