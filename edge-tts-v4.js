@@ -4,8 +4,8 @@
 (function(window) {
   'use strict';
 
-  // ★★★ 关键：使用 jinyj 自己的 Windows 服务器 URL
-  const WORKER_URL = 'https://outstanding-opponents-ward-exam.trycloudflare.com';
+  // ★★★ 关键：使用 jinyj 自己的 Windows 服务器 URL（永久域名）
+  const WORKER_URL = 'https://tts.jinyj.ccwu.cc';
 
   // 30+ Edge TTS 常用语音
   const DEFAULT_VOICES = [
