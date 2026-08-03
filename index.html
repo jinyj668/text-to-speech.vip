@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>免费在线文字转语音工具 - 支持MP3下载 | text-to-speech.vip</title>
-  <meta name="description" content="免费的在线文字转语音工具，支持MP3下载。无需注册，无需付费，中文/英文/多语言支持。基于浏览器原生Edge TTS API。">
+  <meta name="description" content="免费的在线文字转语音工具，支持MP3下载。基于Microsoft Edge TTS，15种高质量神经声音，覆盖普通话、粤语、台湾话、东北话、陕西话、日语、韩语。">
   <meta name="keywords" content="文字转语音,在线TTS,免费TTS,文字转MP3,Edge TTS,语音合成,text to speech">
   <meta name="author" content="text-to-speech.vip">
   <meta name="robots" content="index, follow">
   <meta property="og:title" content="免费在线文字转语音工具 - text-to-speech.vip">
-  <meta property="og:description" content="免费的在线文字转语音工具，支持MP3下载。无需注册，无需付费。">
+  <meta property="og:description" content="免费的在线文字转语音工具，基于Microsoft Edge TTS，15种神经声音，支持MP3下载。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://text-to-speech.vip">
   <link rel="canonical" href="https://text-to-speech.vip/">
@@ -54,23 +54,31 @@
         "name": "这个文字转语音工具是免费的吗？",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "完全免费，无需注册，无需付费。基于浏览器原生Edge TTS API。"
+          "text": "完全免费，无需注册，无需付费。基于Microsoft Edge TTS神经声音技术。"
         }
       },
       {
         "@type": "Question",
-        "name": "支持哪些语言？",
+        "name": "支持哪些语言和声音？",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "支持中文、英文、日语、韩语等30多种语言。系统已安装的所有Edge TTS语音都可以使用。"
+          "text": "支持7种语言、15种神经声音：普通话（晓晓/云希/云健/晓伊/云扬）、粤语（晓曼/云龙）、台湾普通话（晓臻/云哲）、东北话（晓北）、陕西话（晓妮）、日语（七海/慶太）、韩语（선히/인준）。"
         }
       },
       {
         "@type": "Question",
-        "name": "可以下载MP3吗？",
+        "name": "支持哪些音频格式？",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "可以。点击下载按钮保存为WAV或MP3格式。"
+          "text": "支持下载MP3格式音频（MPEG Layer III，24kHz单声道）。不支持WAV格式。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "我的文本会被保存或上传吗？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "你的文本会通过我们的服务器（jinyj.ccwu.cc）转发到Microsoft Edge TTS官方API以生成语音。我们不存储你的文本内容。"
         }
       }
     ]
@@ -338,15 +346,14 @@
   <div class="container">
     <header>
       <h1>🔊 免费在线文字转语音 <span class="badge">✓ 支持MP3下载</span></h1>
-      <p class="subtitle">无需下载，直接朗读 · 支持MP3下载 · 完全免费</p>
+      <p class="subtitle">15种Microsoft Edge神经声音 · 支持MP3下载 · 完全免费</p>
     </header>
 
     <div class="main-card">
       <label for="textInput">📝 输入你要转换的文字</label>
       <textarea
         id="textInput"
-        placeholder="在这里输入或粘贴文字，比如一段文章、台词、通知内容...
-支持中文、英文、日文、韩文等多语言朗读"
+        placeholder="在这里输入或粘贴文字，比如一段文章、台词、通知内容...支持中文（含普通话/粤语/台湾话/东北话/陕西话）、日语、韩语朗读"
       ></textarea>
       <div class="char-count" id="charCount">0 字符</div>
 
@@ -407,31 +414,37 @@
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
         <summary itemprop="name">这个文字转语音工具是免费的吗？</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">完全免费，无需注册，无需付费。基于浏览器原生Edge TTS API。</p>
+          <p itemprop="text">完全免费，无需注册，无需付费。基于Microsoft Edge TTS神经声音技术。</p>
         </div>
       </details>
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">支持哪些语言？</summary>
+        <summary itemprop="name">支持哪些语言和声音？</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">支持中文（普通话、粤语、台湾话）、英文、日语、韩语等30多种语言。</p>
+          <p itemprop="text">支持7种语言、15种神经声音：普通话（晓晓/云希/云健/晓伊/云扬）、粤语（晓曼/云龙）、台湾普通话（晓臻/云哲）、东北话（晓北）、陕西话（晓妮）、日语（七海/慶太）、韩语（선히/인준）。注：因Microsoft Edge TTS稳定性差异，英文等其他声音暂未开放。</p>
         </div>
       </details>
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">可以下载音频吗？</summary>
+        <summary itemprop="name">支持哪些音频格式？</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">可以。点击"下载"按钮保存为WAV或MP3格式。</p>
+          <p itemprop="text">支持下载MP3格式音频（MPEG Layer III，24kHz单声道）。不支持WAV格式。</p>
         </div>
       </details>
       <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">我的文本会被保存吗？</summary>
+        <summary itemprop="name">我的文本会被保存或上传吗？</summary>
         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">不会。所有处理都在你的浏览器本地完成，文本不上传任何服务器。</p>
+          <p itemprop="text">你的文本会通过我们的服务器（jinyj.ccwu.cc）转发到Microsoft Edge TTS官方API以生成语音。我们不存储你的文本内容，也不会用于其他用途。</p>
+        </div>
+      </details>
+      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <summary itemprop="name">生成失败怎么办？</summary>
+        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <p itemprop="text">如果某个声音偶尔生成失败，请尝试换一个声音（系统会自动fallback到同语言其他声音）。如果所有声音都失败，可能是网络问题，请稍后重试。</p>
         </div>
       </details>
     </section>
 
     <footer style="text-align:center; padding: 20px; color: #999; font-size: 14px;">
-      <p>© 2026 text-to-speech.vip · 免费工具 · 浏览器本地处理</p>
+      <p>© 2026 text-to-speech.vip · 免费工具 · 基于Microsoft Edge TTS</p>
     </footer>
 
     <!-- 广告位 -->
@@ -440,7 +453,7 @@
     </div>
   </div>
 
-  <script src="edge-tts-v4.js"></script>
+  <script src="edge-tts-v4.js?v=6"></script>
   <script>
     // ===== jinyj 的 Edge TTS 集成（Windows 服务器 HTTP API 版）=====
     const { DEFAULT_VOICES, generateAudio: apiGenerateAudio, WORKER_URL } = window.EdgeTTS;
@@ -571,8 +584,7 @@
           voiceCount.textContent = `共 ${total} 种声音 · Edge 神经声音`;
         }
 
-        // 初始化 Edge TTS Client
-        // 朗读按钮
+        // 朗读按钮 - 三态：停止/播放/暂停
         async function toggleSpeech() {
           const text = textInput.value.trim();
           if (!text) {
@@ -582,26 +594,23 @@
             return;
           }
 
-          // 暂停/继续
-          if (currentAudio && !currentAudio.paused) {
+          // 状态 1: 正在播放 → 暂停
+          if (currentAudio && !currentAudio.paused && !currentAudio.ended) {
             currentAudio.pause();
-            isSpeaking = false;
-            isPaused = true;
             speakBtnText.textContent = '▶ 继续朗读';
-            statusBar.textContent = '已暂停';
+            statusBar.textContent = '⏸ 已暂停';
             return;
           }
 
+          // 状态 2: 已暂停 → 继续
           if (currentAudio && currentAudio.paused) {
             currentAudio.play();
-            isSpeaking = true;
-            isPaused = false;
             speakBtnText.textContent = '⏸ 暂停';
-            statusBar.textContent = '朗读中...';
+            statusBar.textContent = '🔊 朗读中...';
             return;
           }
 
-          // 开始朗读
+          // 状态 3: 停止状态 → 开始朗读
           await startSpeech(text);
         }
 
@@ -609,38 +618,62 @@
           try {
             statusBar.textContent = '正在生成音频...';
             statusBar.className = 'status-bar';
-            // 不立即禁用按钮 - 防止 generateAudio hang 时无法重试
 
             const audioBuffer = await generateAudio(text);
             if (!audioBuffer) {
               throw new Error('音频生成失败');
             }
 
-            // 创建 Blob URL 并播放
+            // 创建 Blob URL
             const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
             const url = URL.createObjectURL(blob);
 
+            // 清理旧音频
             if (currentAudio) {
-              currentAudio.pause();
+              try {
+                currentAudio.pause();
+                currentAudio.removeAttribute('src');
+                currentAudio.load();
+              } catch (e) {}
               URL.revokeObjectURL(currentAudio.src);
             }
 
-            currentAudio = new Audio(url);
+            currentAudio = new Audio();
             currentAudio.playbackRate = parseFloat(rateSlider.value);
             currentAudio.volume = parseFloat(volumeSlider.value);
+            currentAudio.preload = 'auto';
+
+            // 关键修复：等音频缓冲好再 play，避免开头重复
+            await new Promise((resolve, reject) => {
+              const onReady = () => {
+                currentAudio.removeEventListener('canplaythrough', onReady);
+                currentAudio.removeEventListener('error', onError);
+                resolve();
+              };
+              const onError = (e) => {
+                currentAudio.removeEventListener('canplaythrough', onReady);
+                currentAudio.removeEventListener('error', onError);
+                reject(new Error('音频加载失败'));
+              };
+              currentAudio.addEventListener('canplaythrough', onReady, { once: true });
+              currentAudio.addEventListener('error', onError, { once: true });
+              currentAudio.src = url;
+              currentAudio.load();
+              // 30 秒超时保护
+              setTimeout(() => {
+                currentAudio.removeEventListener('canplaythrough', onReady);
+                currentAudio.removeEventListener('error', onError);
+                resolve();  // 即使超时也继续（避免永久卡住）
+              }, 30000);
+            });
 
             currentAudio.onplay = () => {
-              isSpeaking = true;
-              isPaused = false;
               speakBtnText.textContent = '⏸ 暂停';
               statusBar.textContent = '🔊 朗读中...';
               statusBar.className = 'status-bar speaking';
-              speakBtn.disabled = false;
             };
 
             currentAudio.onended = () => {
-              isSpeaking = false;
-              isPaused = false;
               speakBtnText.textContent = '▶ 开始朗读';
               statusBar.textContent = '✓ 朗读完成';
               statusBar.className = 'status-bar success';
@@ -648,14 +681,13 @@
             };
 
             currentAudio.onerror = () => {
-              isSpeaking = false;
-              isPaused = false;
               speakBtnText.textContent = '▶ 开始朗读';
               statusBar.textContent = '✗ 朗读出错';
               statusBar.className = 'status-bar error';
               setTimeout(() => statusBar.className = 'status-bar', 3000);
             };
 
+            // 现在 audio 已缓冲好，可以播放
             await currentAudio.play();
 
           } catch (err) {
@@ -667,7 +699,7 @@
           }
         }
 
-        // 生成音频（核心函数 - 改用 HTTP API 调 Windows 服务器）
+        // 生成音频（核心函数 - 带 fallback）
         async function generateAudio(text) {
           const selectedIdx = voiceSelect.selectedIndex;
           const selectedVoice = voices[selectedIdx];
@@ -683,7 +715,44 @@
           const volPercent = Math.round((volVal - 1.0) * 100);
           const volStr = (volPercent >= 0 ? '+' : '') + volPercent + '%';
 
-          // 使用 jinyj 的 Windows 服务器 HTTP API
+          // 准备 fallback 列表（如果选的声音失败，尝试其他）
+          const voicesToTry = [selectedVoice];
+          // 同语言的其他声音作为 fallback
+          const sameLang = voices.filter(v =>
+            v.Locale === selectedVoice.Locale && v.ShortName !== selectedVoice.ShortName
+          );
+          voicesToTry.push(...sameLang.slice(0, 3));
+
+          // 逐个尝试
+          let lastError = null;
+          for (let i = 0; i < voicesToTry.length; i++) {
+            const voice = voicesToTry[i];
+            const isPrimary = i === 0;
+
+            try {
+              const result = await tryGenerate(text, voice, rateStr, volStr);
+              if (isPrimary) {
+                return result;
+              } else {
+                // Fallback 成功了，告诉用户
+                statusBar.textContent = `原声音失败，已自动切换到 ${voice.FriendlyName.split(' - ')[0].replace('Microsoft ', '')}`;
+                return result;
+              }
+            } catch (err) {
+              lastError = err;
+              console.warn(`Voice ${voice.ShortName} failed:`, err.message);
+              if (isPrimary) {
+                statusBar.textContent = `声音 ${voice.ShortName} 失败，尝试其他...`;
+              }
+            }
+          }
+
+          throw lastError || new Error('所有声音都失败');
+        }
+
+        // 单次尝试
+        async function tryGenerate(text, voice, rateStr, volStr) {
+          // 30 秒超时
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 30000);
 
@@ -694,7 +763,7 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 text: text,
-                voice: selectedVoice.ShortName,
+                voice: voice.ShortName,
                 rate: rateStr,
                 volume: volStr,
               }),
@@ -703,7 +772,7 @@
           } catch (err) {
             clearTimeout(timeout);
             if (err.name === 'AbortError') {
-              throw new Error('生成超时(30秒)，请重试或换一个声音');
+              throw new Error('生成超时(30秒)');
             }
             throw err;
           }
