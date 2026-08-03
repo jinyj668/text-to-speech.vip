@@ -607,9 +607,9 @@
 
         async function startSpeech(text) {
           try {
-            statusBar.textContent = '⏳ 正在生成音频...';
+            statusBar.textContent = '正在生成音频...';
             statusBar.className = 'status-bar';
-            speakBtn.disabled = true;
+            // 不立即禁用按钮 - 防止 generateAudio hang 时无法重试
 
             const audioBuffer = await generateAudio(text);
             if (!audioBuffer) {
@@ -684,16 +684,30 @@
           const volStr = (volPercent >= 0 ? '+' : '') + volPercent + '%';
 
           // 使用 jinyj 的 Windows 服务器 HTTP API
-          const response = await fetch(window.EdgeTTS.WORKER_URL + '/api/tts', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: text,
-              voice: selectedVoice.ShortName,
-              rate: rateStr,
-              volume: volStr,
-            }),
-          });
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 30000);
+
+          let response;
+          try {
+            response = await fetch(window.EdgeTTS.WORKER_URL + '/api/tts', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                text: text,
+                voice: selectedVoice.ShortName,
+                rate: rateStr,
+                volume: volStr,
+              }),
+              signal: controller.signal,
+            });
+          } catch (err) {
+            clearTimeout(timeout);
+            if (err.name === 'AbortError') {
+              throw new Error('生成超时(30秒)，请重试或换一个声音');
+            }
+            throw err;
+          }
+          clearTimeout(timeout);
 
           if (!response.ok) {
             let errMsg = 'HTTP ' + response.status;
