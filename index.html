@@ -384,13 +384,13 @@
       </div>
 
       <div class="buttons">
-        <button class="btn btn-primary" id="speakBtn" onclick="toggleSpeech()">
+        <button class="btn btn-primary" id="speakBtn">
           <span id="speakBtnText">▶ 开始朗读</span>
         </button>
-        <button class="btn btn-download" id="downloadBtn" onclick="downloadAudio()">
+        <button class="btn btn-download" id="downloadBtn">
           <span id="downloadBtnText">⬇ 下载MP3</span>
         </button>
-        <button class="btn btn-secondary" id="resetBtn" onclick="resetAll()">
+        <button class="btn btn-secondary" id="resetBtn">
           🔄 重置
         </button>
       </div>
@@ -453,7 +453,7 @@
     </div>
   </div>
 
-  <script src="edge-tts-v4.js?v=6"></script>
+  <script src="edge-tts-v4.js?v=7"></script>
   <script>
     // ===== jinyj 的 Edge TTS 集成（Windows 服务器 HTTP API 版）=====
     const { DEFAULT_VOICES, generateAudio: apiGenerateAudio, WORKER_URL } = window.EdgeTTS;
@@ -474,11 +474,7 @@
     const statusBar = document.getElementById('statusBar');
 
     let voices = DEFAULT_VOICES;
-        let isSpeaking = false;
-        let isPaused = false;
         let isDownloading = false;
-        let ttsClient = null;
-        let currentAudio = null;  // 当前播放的 Audio 对象
 
         // 字符计数
         textInput.addEventListener('input', () => {
@@ -584,111 +580,222 @@
           voiceCount.textContent = `共 ${total} 种声音 · Edge 神经声音`;
         }
 
-        // 朗读按钮 - 三态：停止/播放/暂停
-        async function toggleSpeech() {
-          const text = textInput.value.trim();
-          if (!text) {
-            statusBar.textContent = '请先输入要朗读的文字';
-            statusBar.className = 'status-bar error';
-            setTimeout(() => statusBar.className = 'status-bar', 2000);
-            return;
-          }
+        // ============================================================
+        // 朗读按钮 - 完整重写（修复暂停/竞态/超时问题）
+        // ============================================================
+                let currentAudio = null;      // 当前播放的 Audio 对象
+                let audioUrl = null;          // 当前 Blob URL（需要清理）
+                let playbackState = 'idle';   // idle | loading | playing | paused | ended | error
+                let isProcessing = false;     // 防抖标志
 
-          // 状态 1: 正在播放 → 暂停
-          if (currentAudio && !currentAudio.paused && !currentAudio.ended) {
-            currentAudio.pause();
-            speakBtnText.textContent = '▶ 继续朗读';
-            statusBar.textContent = '⏸ 已暂停';
-            return;
-          }
+                // 强制清理旧音频资源
+                function destroyAudio() {
+                  try {
+                    if (currentAudio) {
+                      currentAudio.pause();
+                      currentAudio.removeAttribute('src');
+                      currentAudio.load();
+                      currentAudio.onplay = null;
+                      currentAudio.onpause = null;
+                      currentAudio.onended = null;
+                      currentAudio.onerror = null;
+                      currentAudio.ontimeupdate = null;
+                      currentAudio = null;
+                    }
+                    if (audioUrl) {
+                      URL.revokeObjectURL(audioUrl);
+                      audioUrl = null;
+                    }
+                  } catch (e) {
+                    console.warn('destroyAudio:', e);
+                  }
+                }
 
-          // 状态 2: 已暂停 → 继续
-          if (currentAudio && currentAudio.paused) {
-            currentAudio.play();
-            speakBtnText.textContent = '⏸ 暂停';
-            statusBar.textContent = '🔊 朗读中...';
-            return;
-          }
+                // 更新 UI（按钮文字 + 状态栏）
+                function updateUI(state) {
+                  playbackState = state;
+                  switch (state) {
+                    case 'idle':
+                      speakBtnText.textContent = '▶ 开始朗读';
+                      statusBar.textContent = '准备就绪';
+                      statusBar.className = 'status-bar';
+                      break;
+                    case 'loading':
+                      speakBtnText.textContent = '⏳ 生成中...';
+                      statusBar.textContent = '⏳ 正在生成音频...';
+                      statusBar.className = 'status-bar';
+                      break;
+                    case 'playing':
+                      speakBtnText.textContent = '⏸ 暂停';
+                      statusBar.textContent = '🔊 朗读中...';
+                      statusBar.className = 'status-bar speaking';
+                      break;
+                    case 'paused':
+                      speakBtnText.textContent = '▶ 继续朗读';
+                      statusBar.textContent = '⏸ 已暂停';
+                      statusBar.className = 'status-bar';
+                      break;
+                    case 'ended':
+                      speakBtnText.textContent = '▶ 开始朗读';
+                      statusBar.textContent = '✓ 朗读完成';
+                      statusBar.className = 'status-bar success';
+                      break;
+                    case 'error':
+                      speakBtnText.textContent = '▶ 开始朗读';
+                      statusBar.className = 'status-bar error';
+                      break;
+                  }
+                }
 
-          // 状态 3: 停止状态 → 开始朗读
-          await startSpeech(text);
-        }
+                // 点击朗读按钮 - 简化三态
+                async function toggleSpeech() {
+                  // 防抖：如果正在处理（loading），忽略点击
+                  if (playbackState === 'loading') {
+                    console.log('正在加载中，忽略点击');
+                    return;
+                  }
 
-        async function startSpeech(text) {
-          try {
-            statusBar.textContent = '正在生成音频...';
-            statusBar.className = 'status-bar';
+                  if (playbackState === 'idle' || playbackState === 'ended' || playbackState === 'error') {
+                    // 开始新朗读
+                    const text = textInput.value.trim();
+                    if (!text) {
+                      statusBar.textContent = '请先输入要朗读的文字';
+                      statusBar.className = 'status-bar error';
+                      setTimeout(() => {
+                        if (playbackState === 'idle') {
+                          statusBar.textContent = '准备就绪';
+                          statusBar.className = 'status-bar';
+                        }
+                      }, 2000);
+                      return;
+                    }
+                    await startSpeech(text);
+                  } else if (playbackState === 'playing') {
+                    // 暂停
+                    if (currentAudio) {
+                      currentAudio.pause();
+                      updateUI('paused');
+                    }
+                  } else if (playbackState === 'paused') {
+                    // 继续
+                    if (currentAudio) {
+                      currentAudio.play().catch(err => {
+                        console.error('Play failed:', err);
+                        updateUI('error');
+                        statusBar.textContent = '✗ 继续播放失败: ' + err.message;
+                        setTimeout(() => updateUI('idle'), 3000);
+                      });
+                      updateUI('playing');
+                    }
+                  }
+                }
 
-            const audioBuffer = await generateAudio(text);
-            if (!audioBuffer) {
-              throw new Error('音频生成失败');
-            }
+                async function startSpeech(text) {
+                  updateUI('loading');
 
-            // 创建 Blob URL
-            const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
-            const url = URL.createObjectURL(blob);
+                  try {
+                    const audioBuffer = await generateAudio(text);
+                    if (!audioBuffer || audioBuffer.length < 100) {
+                      throw new Error('音频数据无效');
+                    }
 
-            // 清理旧音频
-            if (currentAudio) {
-              try {
-                currentAudio.pause();
-                currentAudio.removeAttribute('src');
-                currentAudio.load();
-              } catch (e) {}
-              URL.revokeObjectURL(currentAudio.src);
-            }
+                    // 清理旧资源
+                    destroyAudio();
 
-            currentAudio = new Audio();
-            currentAudio.playbackRate = parseFloat(rateSlider.value);
-            currentAudio.volume = parseFloat(volumeSlider.value);
-            currentAudio.preload = 'auto';
+                    // 创建 Blob
+                    const blob = new Blob([audioBuffer], { type: 'audio/mpeg' });
+                    audioUrl = URL.createObjectURL(blob);
 
-            // 关键修复：等音频缓冲好再 play，避免开头重复
-            await new Promise((resolve, reject) => {
-              const onReady = () => {
-                currentAudio.removeEventListener('canplaythrough', onReady);
-                currentAudio.removeEventListener('error', onError);
-                resolve();
-              };
-              const onError = (e) => {
-                currentAudio.removeEventListener('canplaythrough', onReady);
-                currentAudio.removeEventListener('error', onError);
-                reject(new Error('音频加载失败'));
-              };
-              currentAudio.addEventListener('canplaythrough', onReady, { once: true });
-              currentAudio.addEventListener('error', onError, { once: true });
-              currentAudio.src = url;
-              currentAudio.load();
-              // 30 秒超时保护
-              setTimeout(() => {
-                currentAudio.removeEventListener('canplaythrough', onReady);
-                currentAudio.removeEventListener('error', onError);
-                resolve();  // 即使超时也继续（避免永久卡住）
-              }, 30000);
-            });
+                    // 创建 Audio（先不设 src，等 canplaythrough 再 play）
+                    const audio = new Audio();
+                    audio.preload = 'auto';
+                    audio.playbackRate = parseFloat(rateSlider.value) || 1.0;
+                    audio.volume = parseFloat(volumeSlider.value) || 1.0;
+                    currentAudio = audio;
 
-            currentAudio.onplay = () => {
-              speakBtnText.textContent = '⏸ 暂停';
-              statusBar.textContent = '🔊 朗读中...';
-              statusBar.className = 'status-bar speaking';
-            };
+                    // 设置事件
+                    audio.onplay = () => {
+                      console.log('Audio onplay');
+                      updateUI('playing');
+                    };
 
-            currentAudio.onended = () => {
-              speakBtnText.textContent = '▶ 开始朗读';
-              statusBar.textContent = '✓ 朗读完成';
-              statusBar.className = 'status-bar success';
-              setTimeout(() => { if (statusBar.className === 'status-bar success') statusBar.className = 'status-bar'; }, 2000);
-            };
+                    audio.onpause = () => {
+                      console.log('Audio onpause, state:', playbackState);
+                      // 只在 playing 状态下 pause 才说明用户手动暂停
+                      if (playbackState === 'playing') {
+                        updateUI('paused');
+                      }
+                    };
 
-            currentAudio.onerror = () => {
-              speakBtnText.textContent = '▶ 开始朗读';
-              statusBar.textContent = '✗ 朗读出错';
-              statusBar.className = 'status-bar error';
-              setTimeout(() => statusBar.className = 'status-bar', 3000);
-            };
+                    audio.onended = () => {
+                      console.log('Audio onended');
+                      updateUI('ended');
+                      setTimeout(() => {
+                        if (playbackState === 'ended') updateUI('idle');
+                      }, 2000);
+                    };
 
-            // 现在 audio 已缓冲好，可以播放
-            await currentAudio.play();
+                    audio.onerror = (e) => {
+                      console.error('Audio error:', e);
+                      updateUI('error');
+                      statusBar.textContent = '✗ 音频播放失败';
+                      setTimeout(() => updateUI('idle'), 3000);
+                    };
+
+                    // 60 秒超时（如果音频一直没结束，认为出问题了）
+                    let playbackTimeout;
+                    const startPlaybackTimer = () => {
+                      clearTimeout(playbackTimeout);
+                      playbackTimeout = setTimeout(() => {
+                        if (playbackState === 'playing' || playbackState === 'paused') {
+                          console.warn('Playback timeout - force reset');
+                          destroyAudio();
+                          updateUI('error');
+                          statusBar.textContent = '✗ 播放超时';
+                          setTimeout(() => updateUI('idle'), 3000);
+                        }
+                      }, 60000);  // 60秒
+                    };
+
+                    // 等音频准备好再播放（避免开头重复）
+                    await new Promise((resolve, reject) => {
+                      const onReady = () => {
+                        audio.removeEventListener('canplaythrough', onReady);
+                        audio.removeEventListener('error', onError);
+                        clearTimeout(readyTimeout);
+                        resolve();
+                      };
+                      const onError = (e) => {
+                        audio.removeEventListener('canplaythrough', onReady);
+                        audio.removeEventListener('error', onError);
+                        clearTimeout(readyTimeout);
+                        reject(new Error('音频加载失败'));
+                      };
+                      audio.addEventListener('canplaythrough', onReady, { once: true });
+                      audio.addEventListener('error', onError, { once: true });
+                      audio.src = audioUrl;
+                      audio.load();
+                      // 30 秒准备超时
+                      const readyTimeout = setTimeout(() => {
+                        audio.removeEventListener('canplaythrough', onReady);
+                        audio.removeEventListener('error', onError);
+                        console.warn('Audio ready timeout, forcing play');
+                        resolve();  // 即使超时也尝试播放
+                      }, 30000);
+                    });
+
+                    // 开始播放
+                    startPlaybackTimer();
+                    await audio.play();
+
+                  } catch (err) {
+                    console.error('startSpeech error:', err);
+                    destroyAudio();
+                    updateUI('error');
+                    statusBar.textContent = '✗ ' + (err.message || '未知错误');
+                    setTimeout(() => updateUI('idle'), 3000);
+                  }
+                }
 
           } catch (err) {
             console.error('Speech error:', err);
@@ -861,21 +968,14 @@
         }
 
         function resetAll() {
-          if (currentAudio) {
-            currentAudio.pause();
-            currentAudio = null;
-          }
+          destroyAudio();
+          updateUI('idle');
           textInput.value = '';
           charCount.textContent = '0 字符';
           rateSlider.value = 1;
           volumeSlider.value = 1;
           rateValue.textContent = '1.0x';
           volumeValue.textContent = '100%';
-          isSpeaking = false;
-          isPaused = false;
-          speakBtnText.textContent = '▶ 开始朗读';
-          statusBar.textContent = '准备就绪';
-          statusBar.className = 'status-bar';
         }
 
         rateSlider.addEventListener('input', () => {
