@@ -440,7 +440,7 @@
     </div>
   </div>
 
-  <script src="edge-tts-v4.js?v=5"></script>
+  <script src="edge-tts-v4.js"></script>
   <script>
     // ===== jinyj 的 Edge TTS 集成（Windows 服务器 HTTP API 版）=====
     const { DEFAULT_VOICES, generateAudio: apiGenerateAudio, WORKER_URL } = window.EdgeTTS;
@@ -582,29 +582,23 @@
             return;
           }
 
-          // 暂停
-          if (currentAudio && !currentAudio.paused && !currentAudio.ended && isSpeaking) {
+          // 暂停/继续
+          if (currentAudio && !currentAudio.paused) {
             currentAudio.pause();
+            isSpeaking = false;
             isPaused = true;
             speakBtnText.textContent = '▶ 继续朗读';
             statusBar.textContent = '已暂停';
             return;
           }
 
-          // 继续
-          if (currentAudio && currentAudio.paused && isPaused) {
+          if (currentAudio && currentAudio.paused) {
             currentAudio.play();
+            isSpeaking = true;
             isPaused = false;
             speakBtnText.textContent = '⏸ 暂停';
-            statusBar.textContent = '🔊 朗读中...';
+            statusBar.textContent = '朗读中...';
             return;
-          }
-
-          // 停止已结束的音频，开始新一轮
-          if (currentAudio && currentAudio.ended) {
-            currentAudio = null;
-            isSpeaking = false;
-            isPaused = false;
           }
 
           // 开始朗读
@@ -673,7 +667,7 @@
           }
         }
 
-        // 生成音频（核心函数 - 带 fallback）
+        // 生成音频（核心函数 - 改用 HTTP API 调 Windows 服务器）
         async function generateAudio(text) {
           const selectedIdx = voiceSelect.selectedIndex;
           const selectedVoice = voices[selectedIdx];
@@ -689,44 +683,7 @@
           const volPercent = Math.round((volVal - 1.0) * 100);
           const volStr = (volPercent >= 0 ? '+' : '') + volPercent + '%';
 
-          // 准备 fallback 列表（如果选的声音失败，尝试其他）
-          const voicesToTry = [selectedVoice];
-          // 同语言的其他声音作为 fallback
-          const sameLang = voices.filter(v =>
-            v.Locale === selectedVoice.Locale && v.ShortName !== selectedVoice.ShortName
-          );
-          voicesToTry.push(...sameLang.slice(0, 3));
-
-          // 逐个尝试
-          let lastError = null;
-          for (let i = 0; i < voicesToTry.length; i++) {
-            const voice = voicesToTry[i];
-            const isPrimary = i === 0;
-
-            try {
-              const result = await tryGenerate(text, voice, rateStr, volStr);
-              if (isPrimary) {
-                return result;
-              } else {
-                // Fallback 成功了，告诉用户
-                statusBar.textContent = `原声音失败，已自动切换到 ${voice.FriendlyName.split(' - ')[0].replace('Microsoft ', '')}`;
-                return result;
-              }
-            } catch (err) {
-              lastError = err;
-              console.warn(`Voice ${voice.ShortName} failed:`, err.message);
-              if (isPrimary) {
-                statusBar.textContent = `声音 ${voice.ShortName} 失败，尝试其他...`;
-              }
-            }
-          }
-
-          throw lastError || new Error('所有声音都失败');
-        }
-
-        // 单次尝试
-        async function tryGenerate(text, voice, rateStr, volStr) {
-          // 30 秒超时
+          // 使用 jinyj 的 Windows 服务器 HTTP API
           const controller = new AbortController();
           const timeout = setTimeout(() => controller.abort(), 30000);
 
@@ -737,7 +694,7 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 text: text,
-                voice: voice.ShortName,
+                voice: selectedVoice.ShortName,
                 rate: rateStr,
                 volume: volStr,
               }),
@@ -746,7 +703,7 @@
           } catch (err) {
             clearTimeout(timeout);
             if (err.name === 'AbortError') {
-              throw new Error('生成超时(30秒)');
+              throw new Error('生成超时(30秒)，请重试或换一个声音');
             }
             throw err;
           }
