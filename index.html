@@ -530,6 +530,7 @@
 
         // 填充语音下拉
         function populateVoiceList() {
+          console.log('populateVoiceList 开始, voices.length:', voices.length);
           voiceSelect.innerHTML = '';
 
           // 按 Locale 分组
@@ -539,6 +540,8 @@
             if (!groups[label]) groups[label] = [];
             groups[label].push({ voice: voice, index: i });
           });
+
+          console.log('Locale 分组:', groups);
 
           // 语言优先级
           const priority = ['中文', '英文', '日文', '韩文'];
@@ -556,7 +559,6 @@
             groups[label].forEach(({ voice, index }) => {
               const option = document.createElement('option');
               option.value = index;
-              // 简化名字：去掉 "Microsoft" 和 "Online (Natural) - "
               const cleanName = voice.FriendlyName
                 .replace('Microsoft ', '')
                 .replace(' Online (Natural) - ', ' - ')
@@ -566,7 +568,6 @@
               option.dataset.locale = voice.Locale;
               optgroup.appendChild(option);
 
-              // 默认选中文 Xiaoxiao
               if (voice.ShortName === 'zh-CN-XiaoxiaoNeural') {
                 defaultIndex = index;
               }
@@ -578,6 +579,7 @@
           voiceSelect.selectedIndex = defaultIndex;
           const total = voices.length;
           voiceCount.textContent = `共 ${total} 种声音 · Edge 神经声音`;
+          console.log('populateVoiceList 完成');
         }
 
         // ============================================================
