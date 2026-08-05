@@ -840,15 +840,6 @@
                   }
                 }
 
-          } catch (err) {
-            console.error('Speech error:', err);
-            statusBar.textContent = '生成失败: ' + (err.message || '未知错误');
-            statusBar.className = 'status-bar error';
-            setTimeout(() => statusBar.className = 'status-bar', 3000);
-            speakBtn.disabled = false;
-          }
-        }
-
         // 生成音频（核心函数 - 带 fallback）
         async function generateAudio(text) {
           const selectedIdx = voiceSelect.selectedIndex;
