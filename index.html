@@ -22,450 +22,8 @@
 
   <!-- Google Analytics GA4 (jinyj668) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-RVSXLDNG8Q"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-RVSXLDNG8Q');
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "免费文字转语音工具",
-    "url": "https://text-to-speech.vip",
-    "description": "免费在线文字转语音工具，支持MP3下载。",
-    "applicationCategory": "MultimediaApplication",
-    "operatingSystem": "Any",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "CNY"
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "这个文字转语音工具是免费的吗？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "完全免费，无需注册，无需付费。基于Microsoft Edge TTS神经声音技术。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "支持哪些语言和声音？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "支持7种语言、15种神经声音：普通话（晓晓/云希/云健/晓伊/云扬）、粤语（晓曼/云龙）、台湾普通话（晓臻/云哲）、东北话（晓北）、陕西话（晓妮）、日语（七海/慶太）、韩语（선히/인준）。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "支持哪些音频格式？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "支持下载MP3格式音频（MPEG Layer III，24kHz单声道）。不支持WAV格式。"
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "我的文本会被保存或上传吗？",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "你的文本会通过我们的服务器（jinyj.ccwu.cc）转发到Microsoft Edge TTS官方API以生成语音。我们不存储你的文本内容。"
-        }
-      }
-    ]
-  }
-  </script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-      background: #f5f5f5;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 24px 16px;
-      flex: 1;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    h1 {
-      font-size: 26px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 6px;
-    }
-    .subtitle {
-      font-size: 14px;
-      color: #888;
-    }
-    .badge {
-      display: inline-block;
-      background: #e8f5e9;
-      color: #2e7d32;
-      font-size: 12px;
-      padding: 2px 10px;
-      border-radius: 20px;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
-    .main-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      margin-bottom: 16px;
-    }
-    label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      display: block;
-      margin-bottom: 8px;
-    }
-    textarea {
-      width: 100%;
-      height: 160px;
-      border: 2px solid #e8e8e8;
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 16px;
-      resize: vertical;
-      transition: border-color 0.2s;
-      font-family: inherit;
-      line-height: 1.6;
-    }
-    textarea:focus {
-      outline: none;
-      border-color: #4a90d9;
-    }
-    textarea::placeholder {
-      color: #bbb;
-    }
-    .char-count {
-      text-align: right;
-      font-size: 12px;
-      color: #bbb;
-      margin-top: 4px;
-    }
-    .controls {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-      margin-top: 20px;
-    }
-    .control-group {
-      display: flex;
-      flex-direction: column;
-    }
-    .control-group.full {
-      grid-column: 1 / -1;
-    }
-    .value-display {
-      font-size: 13px;
-      color: #4a90d9;
-      font-weight: 600;
-      margin-bottom: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    select {
-      width: 100%;
-      height: 42px;
-      border: 2px solid #e8e8e8;
-      border-radius: 10px;
-      padding: 0 12px;
-      font-size: 15px;
-      color: #333;
-      background: #fff;
-      cursor: pointer;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23999' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-    }
-    select:focus {
-      outline: none;
-      border-color: #4a90d9;
-    }
-    input[type="range"] {
-      width: 100%;
-      height: 6px;
-      -webkit-appearance: none;
-      background: #e8e8e8;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: #4a90d9;
-      cursor: pointer;
-      box-shadow: 0 1px 4px rgba(74,144,217,0.3);
-    }
-    .buttons {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .btn {
-      flex: 1;
-      height: 50px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-primary {
-      background: #4a90d9;
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: #3a7fc1;
-    }
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
-    .btn-download {
-      background: #2e7d32;
-      color: #fff;
-    }
-    .btn-download:hover {
-      background: #1b5e20;
-    }
-    .btn-secondary {
-      background: #f0f4ff;
-      color: #4a90d9;
-    }
-    .btn-secondary:hover {
-      background: #e4ecff;
-    }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .status-bar {
-      margin-top: 14px;
-      font-size: 13px;
-      color: #888;
-      height: 20px;
-      text-align: center;
-    }
-    .status-bar.speaking {
-      color: #4a90d9;
-    }
-    .status-bar.success {
-      color: #2e7d32;
-    }
-    .status-bar.error {
-      color: #d32f2f;
-    }
-    .ad-container {
-      background: #f0f0f0;
-      border-radius: 8px;
-      min-height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #bbb;
-      font-size: 13px;
-      margin-top: 16px;
-      text-align: center;
-      padding: 8px;
-    }
-    .tips {
-      background: #fff;
-      border-radius: 16px;
-      padding: 16px 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      margin-bottom: 16px;
-    }
-    .tips h3 {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 8px;
-    }
-    .tips ul {
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .tips li {
-      background: #f0f4ff;
-      color: #4a90d9;
-      font-size: 13px;
-      padding: 4px 12px;
-      border-radius: 20px;
-    }
-    .loading-spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    @media (max-width: 540px) {
-      .controls {
-        grid-template-columns: 1fr;
-      }
-      h1 { font-size: 22px; }
-      .buttons { flex-direction: column; }
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>🔊 免费在线文字转语音 <span class="badge">✓ 支持MP3下载</span></h1>
-      <p class="subtitle">15种Microsoft Edge神经声音 · 支持MP3下载 · 完全免费</p>
-    </header>
-
-    <div class="main-card">
-      <label for="textInput">📝 输入你要转换的文字</label>
-      <textarea
-        id="textInput"
-        placeholder="在这里输入或粘贴文字，比如一段文章、台词、通知内容...支持中文（含普通话/粤语/台湾话/东北话/陕西话）、日语、韩语朗读"
-      ></textarea>
-      <div class="char-count" id="charCount">0 字符</div>
-
-      <div class="controls">
-        <div class="control-group">
-          <div class="value-display">
-            <span>语速</span>
-            <span id="rateValue">1.0x</span>
-          </div>
-          <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
-        </div>
-        <div class="control-group">
-          <div class="value-display">
-            <span>音量</span>
-            <span id="volumeValue">100%</span>
-          </div>
-          <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="1">
-        </div>
-        <div class="control-group full">
-          <div class="value-display">
-            <span>声音</span>
-            <span id="voiceCount"></span>
-          </div>
-          <select id="voiceSelect">
-            <option value="">加载中...</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="buttons">
-        <button class="btn btn-primary" id="speakBtn">
-          <span id="speakBtnText">▶ 开始朗读</span>
-        </button>
-        <button class="btn btn-download" id="downloadBtn">
-          <span id="downloadBtnText">⬇ 下载MP3</span>
-        </button>
-        <button class="btn btn-secondary" id="resetBtn">
-          🔄 重置
-        </button>
-      </div>
-
-      <div class="status-bar" id="statusBar">准备就绪</div>
-    </div>
-
-    <div class="tips">
-      <h3>💡 使用技巧</h3>
-      <ul>
-        <li>双击文本框快速全选</li>
-        <li>支持下载MP3文件到本地</li>
-        <li>拖动语速滑块调整朗读速度</li>
-        <li>切换声音尝试不同音色</li>
-        <li>手机端同样可用</li>
-      </ul>
-    </div>
-
-    <section class="faq" itemscope itemtype="https://schema.org/FAQPage">
-      <h3>❓ 常见问题</h3>
-      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">这个文字转语音工具是免费的吗？</summary>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">完全免费，无需注册，无需付费。基于Microsoft Edge TTS神经声音技术。</p>
-        </div>
-      </details>
-      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">支持哪些语言和声音？</summary>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">支持7种语言、15种神经声音：普通话（晓晓/云希/云健/晓伊/云扬）、粤语（晓曼/云龙）、台湾普通话（晓臻/云哲）、东北话（晓北）、陕西话（晓妮）、日语（七海/慶太）、韩语（선히/인준）。注：因Microsoft Edge TTS稳定性差异，英文等其他声音暂未开放。</p>
-        </div>
-      </details>
-      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">支持哪些音频格式？</summary>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">支持下载MP3格式音频（MPEG Layer III，24kHz单声道）。不支持WAV格式。</p>
-        </div>
-      </details>
-      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">我的文本会被保存或上传吗？</summary>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">你的文本会通过我们的服务器（jinyj.ccwu.cc）转发到Microsoft Edge TTS官方API以生成语音。我们不存储你的文本内容，也不会用于其他用途。</p>
-        </div>
-      </details>
-      <details itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-        <summary itemprop="name">生成失败怎么办？</summary>
-        <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
-          <p itemprop="text">如果某个声音偶尔生成失败，请尝试换一个声音（系统会自动fallback到同语言其他声音）。如果所有声音都失败，可能是网络问题，请稍后重试。</p>
-        </div>
-      </details>
-    </section>
-
-    <footer style="text-align:center; padding: 20px; color: #999; font-size: 14px;">
-      <p>© 2026 text-to-speech.vip · 免费工具 · 基于Microsoft Edge TTS</p>
-    </footer>
-
-    <!-- 广告位 - Google AdSense Auto Ads -->
-    <div class="ad-container" id="ad-container">
-      <ins class="adsbygoogle"
-           style="display:block; text-align:center; min-height: 90px;"
-           data-ad-client="ca-pub-3597935079005810"
-           data-ad-slot="auto"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-      </script>
-      <noscript>请启用 JavaScript 以查看 Google AdSense 广告</noscript>
-    </div>
-  </div>
-
-  <script>// jinyj 的 Edge TTS 客户端 - 实测稳定版
-// 只包含实测稳定的 15 种声音（其他 17 种偶尔失败，已移除）
-// 修复：开头 2 字读 2 遍问题
+  <script>// jinyj 的 Edge TTS 客户端 - 32 种声音完整版
+// 通过 jinyj 的 Windows 服务器 + Cloudflare Tunnel 调用 Edge TTS
 
 (function(window) {
   'use strict';
@@ -473,8 +31,7 @@
   // 永久域名 URL
   const WORKER_URL = 'https://tts.jinyj.ccwu.cc';
 
-  // 实测稳定的 15 种声音（基于 2026-08-03 真实测试）
-  // 移除：英文 7 个、法德意俄 4 个、xiaomeng/xiaohan/yunye/yunzhi/xiaorui（不稳定）
+  // 32 种 Edge TTS 神经声音（完整版）
   const DEFAULT_VOICES = [
     // 普通话 5 种
     { ShortName: 'zh-CN-XiaoxiaoNeural', FriendlyName: '晓晓 (Xiaoxiao) - 普通话女声', Gender: 'Female', Locale: 'zh-CN' },
@@ -482,6 +39,13 @@
     { ShortName: 'zh-CN-YunjianNeural', FriendlyName: '云健 (Yunjian) - 普通话男声', Gender: 'Male', Locale: 'zh-CN' },
     { ShortName: 'zh-CN-XiaoyiNeural', FriendlyName: '晓伊 (Xiaoyi) - 普通话女声', Gender: 'Female', Locale: 'zh-CN' },
     { ShortName: 'zh-CN-YunyangNeural', FriendlyName: '云扬 (Yunyang) - 普通话男声', Gender: 'Male', Locale: 'zh-CN' },
+    // 中文女 3 种
+    { ShortName: 'zh-CN-XiaomengNeural', FriendlyName: '晓梦 (Xiaomeng) - 普通话女声', Gender: 'Female', Locale: 'zh-CN' },
+    { ShortName: 'zh-CN-XiaohanNeural', FriendlyName: '晓涵 (Xiaohan) - 普通话女声', Gender: 'Female', Locale: 'zh-CN' },
+    { ShortName: 'zh-CN-XiaoruiNeural', FriendlyName: '晓睿 (Xiaorui) - 普通话女声', Gender: 'Female', Locale: 'zh-CN' },
+    // 中文男 2 种
+    { ShortName: 'zh-CN-YunyeNeural', FriendlyName: '云野 (Yunye) - 普通话男声', Gender: 'Male', Locale: 'zh-CN' },
+    { ShortName: 'zh-CN-YunzhiNeural', FriendlyName: '云之 (Yunzhi) - 普通话男声', Gender: 'Male', Locale: 'zh-CN' },
     // 中文方言 2 种
     { ShortName: 'zh-CN-liaoning-XiaobeiNeural', FriendlyName: '晓北 (Xiaobei) - 东北话女声', Gender: 'Female', Locale: 'zh-CN-liaoning' },
     { ShortName: 'zh-CN-shaanxi-XiaoniNeural', FriendlyName: '晓妮 (Xiaoni) - 陕西话女声', Gender: 'Female', Locale: 'zh-CN-shaanxi' },
@@ -491,12 +55,26 @@
     // 台湾普通话 2 种
     { ShortName: 'zh-TW-HsiaoChenNeural', FriendlyName: '晓臻 (HsiaoChen) - 台湾女声', Gender: 'Female', Locale: 'zh-TW' },
     { ShortName: 'zh-TW-YunJheNeural', FriendlyName: '云哲 (YunJhe) - 台湾男声', Gender: 'Male', Locale: 'zh-TW' },
+    // 英文 7 种
+    { ShortName: 'en-US-JennyNeural', FriendlyName: 'Jenny - 英语女声 (美式)', Gender: 'Female', Locale: 'en-US' },
+    { ShortName: 'en-US-GuyNeural', FriendlyName: 'Guy - 英语男声 (美式)', Gender: 'Male', Locale: 'en-US' },
+    { ShortName: 'en-US-AriaNeural', FriendlyName: 'Aria - 英语女声 (美式)', Gender: 'Female', Locale: 'en-US' },
+    { ShortName: 'en-US-DavisNeural', FriendlyName: 'Davis - 英语男声 (美式)', Gender: 'Male', Locale: 'en-US' },
+    { ShortName: 'en-US-TonyNeural', FriendlyName: 'Tony - 英语男声 (美式)', Gender: 'Male', Locale: 'en-US' },
+    { ShortName: 'en-GB-SoniaNeural', FriendlyName: 'Sonia - 英语女声 (英式)', Gender: 'Female', Locale: 'en-GB' },
+    { ShortName: 'en-GB-RyanNeural', FriendlyName: 'Ryan - 英语男声 (英式)', Gender: 'Male', Locale: 'en-GB' },
     // 日语 2 种
     { ShortName: 'ja-JP-NanamiNeural', FriendlyName: '七海 (Nanami) - 日语女声', Gender: 'Female', Locale: 'ja-JP' },
     { ShortName: 'ja-JP-KeitaNeural', FriendlyName: '慶太 (Keita) - 日语男声', Gender: 'Male', Locale: 'ja-JP' },
     // 韩语 2 种
     { ShortName: 'ko-KR-SunHiNeural', FriendlyName: '선히 (Sun-Hi) - 韩语女声', Gender: 'Female', Locale: 'ko-KR' },
     { ShortName: 'ko-KR-InJoonNeural', FriendlyName: '인준 (InJoon) - 韩语男声', Gender: 'Male', Locale: 'ko-KR' },
+    // 法德意俄西 5 种
+    { ShortName: 'fr-FR-DeniseNeural', FriendlyName: 'Denise - 法语女声', Gender: 'Female', Locale: 'fr-FR' },
+    { ShortName: 'de-DE-KatjaNeural', FriendlyName: 'Katja - 德语女声', Gender: 'Female', Locale: 'de-DE' },
+    { ShortName: 'es-ES-ElviraNeural', FriendlyName: 'Elvira - 西班牙语女声', Gender: 'Female', Locale: 'es-ES' },
+    { ShortName: 'it-IT-ElsaNeural', FriendlyName: 'Elsa - 意大利语女声', Gender: 'Female', Locale: 'it-IT' },
+    { ShortName: 'ru-RU-SvetlanaNeural', FriendlyName: 'Светлана - 俄语女声', Gender: 'Female', Locale: 'ru-RU' },
   ];
 
   // 暴露给全局
