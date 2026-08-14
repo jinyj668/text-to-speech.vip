@@ -2,9 +2,6 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>免费在线文字转语音工具 - 支持MP3下载 | text-to-speech.vip</title>
   <meta name="description" content="免费的在线文字转语音工具，支持MP3下载。基于Microsoft Edge TTS，15种高质量神经声音，覆盖普通话、粤语、台湾话、东北话、陕西话、日语、韩语。">
@@ -18,13 +15,30 @@
   <link rel="canonical" href="https://text-to-speech.vip/">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎙️</text></svg>">
 
-  <!-- Google AdSense (jinyj668) -->
-  <!-- Google AdSense - Auto Ads（自动广告）-->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3597935079005810"
-     crossorigin="anonymous"></script>
+  <!-- Google AdSense - 延迟加载（不影响主功能）-->
+  <script>
+    setTimeout(function() {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3597935079005810';
+      s.crossOrigin = 'anonymous';
+      document.head.appendChild(s);
+    }, 3000);
+  </script>
 
-  <!-- Google Analytics GA4 (jinyj668) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RVSXLDNG8Q"></script>
+  <!-- Google Analytics GA4 - 延迟加载 -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RVSXLDNG8Q');
+    setTimeout(function() {
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-RVSXLDNG8Q';
+      document.head.appendChild(s);
+    }, 3000);
+  </script>
   <script>// jinyj 的 Edge TTS 客户端 - 32 种声音完整版
 // 通过 jinyj 的 Windows 服务器 + Cloudflare Tunnel 调用 Edge TTS
 
