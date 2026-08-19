@@ -903,11 +903,30 @@
 
           // 准备 fallback 列表（如果选的声音失败，尝试其他）
           const voicesToTry = [selectedVoice];
-          // 同语言的其他声音作为 fallback
+          // 同语言的其他声音作为 fallback (最多5 个)
           const sameLang = voices.filter(v =>
             v.Locale === selectedVoice.Locale && v.ShortName !== selectedVoice.ShortName
           );
-          voicesToTry.push(...sameLang.slice(0, 3));
+          voicesToTry.push(...sameLang.slice(0, 5));
+
+          // 跨语言 fallback：按稳定性排序
+          const stableFallbacks = [
+            'zh-CN-XiaoxiaoNeural',  // 最稳定
+            'zh-CN-YunxiNeural',
+            'zh-CN-XiaoyiNeural',
+            'zh-CN-shaanxi-XiaoniNeural',
+            'zh-HK-HiuMaanNeural',
+            'zh-TW-YunJheNeural',
+            'ja-JP-KeitaNeural',
+            'ko-KR-SunHiNeural',
+            'ko-KR-InJoonNeural',
+          ];
+          for (const fb of stableFallbacks) {
+            if (!voicesToTry.find(v => v.ShortName === fb)) {
+              const voice = voices.find(v => v.ShortName === fb);
+              if (voice) voicesToTry.push(voice);
+            }
+          }
 
           // 逐个尝试
           let lastError = null;
@@ -921,7 +940,8 @@
                 return result;
               } else {
                 // Fallback 成功了，告诉用户
-                statusBar.textContent = `原声音失败，已自动切换到 ${voice.FriendlyName.split(' - ')[0].replace('Microsoft ', '')}`;
+                const shortName = voice.FriendlyName.split(' - ')[0].replace('Microsoft ', '');
+                statusBar.textContent = `原声音不稳定，已自动切换到 ${shortName}`;
                 return result;
               }
             } catch (err) {
